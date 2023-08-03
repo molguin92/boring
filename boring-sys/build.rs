@@ -543,12 +543,19 @@ fn link_in_precompiled_bcm_o(bssl_dir: &str) {
     let bcm_o_src_path = env::var("BORING_SSL_PRECOMPILED_BCM_O")
         .expect("`fips-link-precompiled` requires `BORING_SSL_PRECOMPILED_BCM_O` env variable to be specified");
 
-    let libcrypto_path = PathBuf::from(bssl_dir)
+    let libcrypto_path_result = PathBuf::from(bssl_dir)
         .join("build/crypto/libcrypto.a")
-        .canonicalize()
-        .unwrap()
-        .display()
-        .to_string();
+        .canonicalize();
+
+    let libcrypto_path = match libcrypto_path_result {
+        Ok(path) => path.display().to_string(),
+        Err(_) => PathBuf::from(bssl_dir)
+            .join("build/libcrypto.a")
+            .canonicalize()
+            .unwrap()
+            .display()
+            .to_string(),
+    };
 
     let bcm_o_dst_path = PathBuf::from(bssl_dir).join("build/bcm-fips.o");
 
