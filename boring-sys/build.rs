@@ -618,6 +618,12 @@ fn main() {
     let bssl_dir = env::var("BORING_BSSL_PATH").unwrap_or_else(|_| build_boring_from_sources());
     let build_path = get_boringssl_platform_output_path();
 
+    // TODO: feature gate
+    println!(
+        "cargo:rustc-link-search=native={}/lib/{}",
+        bssl_dir, build_path
+    );
+
     if cfg!(any(feature = "fips", feature = "fips-link-precompiled")) {
         println!(
             "cargo:rustc-link-search=native={}/build/crypto/{}",

@@ -966,9 +966,10 @@ impl X509NameBuilder {
     }
 }
 
-#[cfg(not(any(feature = "fips", feature = "fips-link-precompiled")))]
-type ValueLen = isize;
-#[cfg(any(feature = "fips", feature = "fips-link-precompiled"))]
+// #[cfg(not(any(feature = "fips", feature = "fips-link-precompiled")))]
+// type ValueLen = isize;
+// #[cfg(any(feature = "fips", feature = "fips-link-precompiled"))]
+// TODO: feature gate
 type ValueLen = i32;
 
 foreign_type_and_impl_send_sync! {
