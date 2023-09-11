@@ -64,6 +64,10 @@ kx-client-pq-preferred = ["kx-safe-default", "kx-client-pq-supported"]
 # Implies "kx-safe-default".
 kx-client-nist-required = ["kx-safe-default"]
 
+# Link with precompiled, PQ-enabled BoringSSL library.
+# Requires setting `BORING_BSSL_PATH`.
+link-cf-libbssl-fips = ["boring-sys/link-cf-libbssl-fips", "no-patches", "pq-experimental", "kx-client-pq-preferred", "kx-client-nist-required"]
+
 [dependencies]
 bitflags = { workspace = true }
 foreign-types = { workspace = true }

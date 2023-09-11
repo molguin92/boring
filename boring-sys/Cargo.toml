@@ -78,6 +78,10 @@ pq-experimental = []
 # required patches.
 no-patches = []
 
+# Link with precompiled, PQ-enabled BoringSSL library.
+# Requires setting `BORING_BSSL_PATH`.
+link-cf-libbssl-fips = ["no-patches", "pq-experimental"]
+
 [build-dependencies]
 bindgen = { workspace = true }
 cmake = { workspace = true }

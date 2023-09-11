@@ -586,14 +586,18 @@ fn check_feature_compatibility() {
     compile_error!("`fips` and `rpk` features are mutually exclusive");
 
     let no_patches_enabled = cfg!(feature = "no-patches");
-    let is_external_native_lib_source =
-        env::var("BORING_BSSL_PATH").is_err() && env::var("BORING_BSSL_SOURCE_PATH").is_err();
+    let bssl_path_set = env::var("BORING_BSSL_PATH").is_ok();
+    let bssl_source_path_set = env::var("BORING_BSSL_SOURCE_PATH").is_ok();
+
+    let is_external_native_lib_source = !bssl_path_set && !bssl_source_path_set;
 
     if no_patches_enabled && is_external_native_lib_source {
         panic!(
             "`no-patches` feature is supposed to be used with `BORING_BSSL_PATH`\
             or `BORING_BSSL_SOURCE_PATH` env variables"
         )
+    } else if cfg!(feature = "link-cf-libbssl-fips") && !bssl_path_set  {
+        panic!("`link-cf-libbssl-fips` requires the `BORING_BSSL_PATH` env variable to be set.")
     }
 
     let features_with_patches_enabled = cfg!(any(feature = "rpk", feature = "pq-experimental"));
@@ -618,11 +622,6 @@ fn main() {
     let bssl_dir = env::var("BORING_BSSL_PATH").unwrap_or_else(|_| build_boring_from_sources());
     let build_path = get_boringssl_platform_output_path();
 
-    // TODO: feature gate
-    println!(
-        "cargo:rustc-link-search=native={}/lib/{}",
-        bssl_dir, build_path
-    );
 
     if cfg!(any(feature = "fips", feature = "fips-link-precompiled")) {
         println!(
@@ -631,6 +630,11 @@ fn main() {
         );
         println!(
             "cargo:rustc-link-search=native={}/build/ssl/{}",
+            bssl_dir, build_path
+        );
+    } else if cfg!(feature = "link-cf-libbssl-fips") {
+        println!(
+            "cargo:rustc-link-search=native={}/lib/{}",
             bssl_dir, build_path
         );
     } else {
@@ -648,6 +652,10 @@ fn main() {
     println!("cargo:rustc-link-lib=static=ssl");
 
     let include_path = env::var("BORING_BSSL_INCLUDE_PATH").unwrap_or_else(|_| {
+        if cfg!(feature = "link-cf-libbssl-fips") {
+            return format!("{}/include", env::var("BORING_BSSL_PATH").unwrap())
+        }
+
         let src_path = get_boringssl_source_path();
 
         if Path::new(&src_path).join("include").exists() {

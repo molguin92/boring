@@ -1944,12 +1944,10 @@ impl SslContextRef {
     }
 }
 
-// #[cfg(not(any(feature = "fips", feature = "fips-link-precompiled")))]
-// type ProtosLen = usize;
-// #[cfg(any(feature = "fips", feature = "fips-link-precompiled"))]
-// type ProtosLen = libc::c_uint;
-// TODO: feature gate
-type ProtosLen = u32;
+#[cfg(not(any(feature = "fips", feature = "fips-link-precompiled", feature = "link-cf-libbssl-fips")))]
+type ProtosLen = usize;
+#[cfg(any(feature = "fips", feature = "fips-link-precompiled", feature = "link-cf-libbssl-fips"))]
+type ProtosLen = libc::c_uint;
 
 /// Information about the state of a cipher.
 pub struct CipherBits {

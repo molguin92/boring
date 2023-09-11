@@ -966,11 +966,10 @@ impl X509NameBuilder {
     }
 }
 
-// #[cfg(not(any(feature = "fips", feature = "fips-link-precompiled")))]
-// type ValueLen = isize;
-// #[cfg(any(feature = "fips", feature = "fips-link-precompiled"))]
-// TODO: feature gate
-type ValueLen = i32;
+#[cfg(not(any(feature = "fips", feature = "fips-link-precompiled", feature = "link-cf-libbssl-fips")))]
+type ValueLen = isize;
+#[cfg(any(feature = "fips", feature = "fips-link-precompiled", feature = "link-cf-libbssl-fips"))]
+type ValueLen = libc::c_int;
 
 foreign_type_and_impl_send_sync! {
     type CType = ffi::X509_NAME;

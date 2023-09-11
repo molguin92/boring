@@ -36,6 +36,10 @@ pq-experimental = ["boring/pq-experimental"]
 # required patches.
 no-patches = ["boring/no-patches"]
 
+# Link with precompiled, PQ-enabled BoringSSL library.
+# Requires setting `BORING_BSSL_PATH`.
+link-cf-libbssl-fips = ["boring/link-cf-libbssl-fips"]
+
 [dependencies]
 boring = { workspace = true }
 boring-sys = { workspace = true }
